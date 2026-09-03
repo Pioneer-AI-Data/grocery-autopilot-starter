@@ -27,7 +27,7 @@ All in `Household/`: `Grocery System.md`, `Pantry Inventory.md`, `Staples.md`, `
 5. Archive the old week, write the new one to `Meal Rotation.md` with the calendar reason per night, stamp `last served`, and print the week with estimated cost.
 
 ### `list`
-Diff the week's ingredients plus due staples against the pantry; split by store per the system note. Price lines from `Staples.md` last-paid (or live via the Kroger scripts, below), print totals against the month's target pace, then write items to the shared Reminders list: **clean product names only, details in the notes field** (parentheses in names break the list's automatic aisle sorting).
+Diff the week's ingredients plus due staples against the pantry; split by store per the system note. Price lines from `Staples.md` last-paid (or live via the Kroger scripts, below), print totals against the month's target pace, then write the list out. On macOS: to the shared Apple Reminders list via osascript, **clean product names only, details in the notes field** (parentheses in names break the list's automatic aisle sorting). On Windows: to `Household/Shopping List.md` in the same shape; the family's shared list app is the front door and the human copies once (see Guides/Windows Setup.md).
 
 ### `inventory` (photos or dictation)
 Update the pantry zone tables best-effort. Do not interrogate item by item.
@@ -55,9 +55,9 @@ Show or change the budget block. Report month-to-date whole-receipt spend agains
 
 Lookup gotchas, learned the hard way: produce often returns a PER-POUND price (treat quantity as pounds); the first search match can be the wrong product tier, so search with the staples row's brand and size and sanity-check against last-paid; a term can transiently 404 (the script reports per line); Kroger ROTATES the refresh token on every use (the script persists the new one); python.org framework Pythons need the bundled certifi fallback already in the script.
 
-## Apple Reminders gotchas (learned the hard way)
+## Apple Reminders gotchas (macOS only; Windows uses Household/Shopping List.md)
 
-- Reminders created by script get a due DATE but no alarm: **Reminders is the list, never the alert channel.** Alerts go out as texts via `scripts/notify-family.sh` (fill in your numbers) or however the household prefers.
+- Reminders created by script get a due DATE but no alarm: **Reminders is the list, never the alert channel.** Alerts go out as texts via `scripts/notify-family.sh` on macOS (fill in your numbers); on Windows the weekly nudge is a Task Scheduler job (Guides/Windows Setup.md).
 - `whose completed is false` can miss just-created items; verify pushes with a second read.
 - `whose name is` scans are very slow on big lists; never loop per-item existence checks. Bulk edits need `with timeout of 900 seconds`, and dedupe by fetching one name at a time and comparing `id`.
 - The list's completed history is purchase-frequency data. Mine it, never delete it.

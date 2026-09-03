@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 """Kroger Products API helper for the grocery skill.
 
-Credentials come from the macOS Keychain (service "kroger-api", accounts
-"client_id" and "client_secret"), never from files in the vault. Stdlib only.
+Credentials never live in the vault. Lookup order: environment variables
+(KROGER_CLIENT_ID / KROGER_CLIENT_SECRET / KROGER_REFRESH_TOKEN), then the
+macOS Keychain (service "kroger-api"), then on Windows/Linux a JSON file at
+~/.grocery-autopilot/kroger-credentials.json (kept out of any synced or
+version-controlled folder). Stdlib only, runs on Mac and Windows.
 
 Usage:
   kroger.py store 43064            find nearby stores, print IDs
@@ -15,9 +18,11 @@ Usage:
 """
 import base64
 import json
+import os
 import ssl
 import subprocess
 import sys
+import webbrowser
 import time
 import urllib.parse
 import urllib.request
@@ -46,22 +51,48 @@ CONFIG = HERE / "kroger-config.json"   # location id only; never secrets
 _tok = {"value": None, "exp": 0}
 
 
+CRED_FILE = Path.home() / ".grocery-autopilot" / "kroger-credentials.json"
+
+
 def keychain(account):
-    r = subprocess.run(
-        ["security", "find-generic-password", "-s", "kroger-api", "-a", account, "-w"],
-        capture_output=True, text=True)
-    if r.returncode != 0:
-        sys.exit("No Keychain item for kroger-api/" + account
+    """Read a credential: env var, then macOS Keychain, then the JSON store."""
+    env = os.environ.get("KROGER_" + account.upper())
+    if env:
+        return env
+    if sys.platform == "darwin":
+        r = subprocess.run(
+            ["security", "find-generic-password", "-s", "kroger-api", "-a", account, "-w"],
+            capture_output=True, text=True)
+        if r.returncode == 0:
+            return r.stdout.strip()
+    if CRED_FILE.is_file():
+        val = json.loads(CRED_FILE.read_text()).get(account)
+        if val:
+            return val
+    if sys.platform == "darwin":
+        sys.exit("No credential for " + account
                  + ". Add it with: security add-generic-password -s kroger-api -a "
                  + account + " -w 'VALUE'")
-    return r.stdout.strip()
+    sys.exit("No credential for " + account + ". Set the KROGER_"
+             + account.upper() + " environment variable, or put it in "
+             + str(CRED_FILE) + ' as {"' + account + '": "VALUE"} (see Guides/Windows Setup.md).')
 
 
 def keychain_set(account, value):
-    subprocess.run(
-        ["security", "add-generic-password", "-U", "-s", "kroger-api",
-         "-a", account, "-w", value],
-        check=True, capture_output=True)
+    if sys.platform == "darwin":
+        subprocess.run(
+            ["security", "add-generic-password", "-U", "-s", "kroger-api",
+             "-a", account, "-w", value],
+            check=True, capture_output=True)
+        return
+    CRED_FILE.parent.mkdir(parents=True, exist_ok=True)
+    d = json.loads(CRED_FILE.read_text()) if CRED_FILE.is_file() else {}
+    d[account] = value
+    CRED_FILE.write_text(json.dumps(d, indent=2) + "\n")
+    try:
+        os.chmod(CRED_FILE, 0o600)
+    except OSError:
+        pass
 
 
 def token_post(body):
@@ -107,7 +138,7 @@ def cmd_auth():
     srv = http.server.HTTPServer(("127.0.0.1", 8000), H)
     srv.timeout = 600
     print("Opening the browser for the Kroger login...")
-    subprocess.run(["open", url])
+    webbrowser.open(url)
     while "code" not in got:
         srv.handle_request()
     d = token_post({"grant_type": "authorization_code", "code": got["code"],

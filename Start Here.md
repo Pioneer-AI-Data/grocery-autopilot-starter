@@ -14,7 +14,7 @@ Open `Household/Grocery System.md` and fill in every [bracketed] blank:
 
 ## 2. Point it at your list (2 minutes)
 
-Type the exact name of your shared Apple Reminders grocery list into `Grocery System.md`. If you do not have one: make a list in Reminders, share it with your family, done. Two rules that matter:
+Type the exact name of your family's shared grocery list into `Grocery System.md` (Apple Reminders on a Mac gets automatic writes; on Windows see `Guides/Windows Setup.md`). If you do not have one: make a list in Reminders, share it with your family, done. Two rules that matter:
 
 - Item names stay plain ("Ketchup") so the list auto-sorts by store section
 - Details go in the item's notes, never in parentheses in the name

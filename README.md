@@ -14,8 +14,8 @@ Built by [Pioneer AI & Data](https://pioneeraidata.com). Free to use, copy, and 
 
 ## What you need
 
-- A Mac (the family alerts and Reminders integration use macOS), with [Claude Code](https://claude.com/claude-code)
-- The Apple Reminders grocery list you probably already have
+- A Mac or Windows computer with [Claude Code](https://claude.com/claude-code) (text alerts and Apple Reminders integration are Mac extras; `Guides/Windows Setup.md` has the Windows equivalents)
+- A shared grocery list your family already uses (Apple Reminders on Mac gets deep integration; any shared list app works)
 - Optional power-up: a free [Kroger developer account](https://developer.kroger.com) for live prices and cart loading
 - Obsidian if you like nice note viewing; plain text editors work fine
 
