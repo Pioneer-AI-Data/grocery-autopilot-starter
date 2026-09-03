@@ -26,3 +26,13 @@ The long version of Start Here, for when you want the why.
 ## Disruptions are normal
 
 "We're out of milk" any day; "we skipped tacos" any night; a photo of the receipt whenever. The system absorbs all three and stays current. The weekly loop is a rhythm, not a cage.
+
+## Running it with another AI assistant
+
+The kit is Markdown, Python, and instructions, none of it Claude-only. What it needs is an AGENTIC assistant: one that reads and writes your local files and runs commands. That means the terminal agents (Claude Code first-class; OpenAI's Codex CLI and Google's Gemini CLI workable), never the chat apps: ChatGPT or Gemini in a browser cannot touch your pantry notes or run the Kroger scripts.
+
+On a non-Claude CLI, two adjustments:
+
+1. Automatic skill loading is Claude Code plumbing. Start each grocery session with "read `.claude/skills/grocery/SKILL.md` and follow it," or copy that file's contents into your agent's own context file (Codex reads this kit's `AGENTS.md` natively; Gemini CLI uses `GEMINI.md`).
+2. Hold the safety rails yourself until you trust the setup: the "never check out, review every cart" rules are instructions, and different models follow instructions differently. Photo inventory also depends on your CLI's image support.
+

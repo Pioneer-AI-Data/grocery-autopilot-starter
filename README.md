@@ -14,7 +14,7 @@ Built by [Pioneer AI & Data](https://pioneeraidata.com). Free to use, copy, and 
 
 ## What you need
 
-- A Mac or Windows computer with [Claude Code](https://claude.com/claude-code) (text alerts and Apple Reminders integration are Mac extras; `Guides/Windows Setup.md` has the Windows equivalents)
+- A Mac or Windows computer with [Claude Code](https://claude.com/claude-code) (text alerts and Apple Reminders integration are Mac extras; `Guides/Windows Setup.md` has the Windows equivalents). Built for Claude Code; other agentic CLIs (OpenAI's Codex CLI, Google's Gemini CLI) can run it too, see the note in `Guides/Setup Guide.md`
 - A shared grocery list your family already uses (Apple Reminders on Mac gets deep integration; any shared list app works)
 - Optional power-up: a free [Kroger developer account](https://developer.kroger.com) for live prices and cart loading
 - Obsidian if you like nice note viewing; plain text editors work fine
