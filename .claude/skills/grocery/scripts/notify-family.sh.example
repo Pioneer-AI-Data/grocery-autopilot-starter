@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Text the household from the Mac's own Messages account.
+# Copy to notify-family.sh, make executable, and fill in your numbers.
+# Usage: notify-family.sh "message"
+for num in "+1XXXXXXXXXX" "+1XXXXXXXXXX"; do
+  osascript -e 'on run argv
+    tell application "Messages"
+      set svc to 1st account whose service type = iMessage
+      send (item 2 of argv) to participant (item 1 of argv) of svc
+    end tell
+  end run' "$num" "$1"
+done

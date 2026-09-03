@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<!-- Weekly plan-day text. Fill in the path and your day (Weekday: 0=Sun..6=Sat),
+     copy to ~/Library/LaunchAgents/, then: launchctl load ~/Library/LaunchAgents/<file> -->
+<dict>
+  <key>Label</key><string>com.example.grocery-planday</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>/FULL/PATH/TO/Grocery Autopilot Starter/.claude/skills/grocery/scripts/notify-family.sh</string>
+    <string>Plan the week: snap fridge/freezer/pantry pics, then say "plan the week".</string>
+  </array>
+  <key>StartCalendarInterval</key>
+  <dict><key>Weekday</key><integer>1</integer><key>Hour</key><integer>10</integer><key>Minute</key><integer>0</integer></dict>
+  <key>StandardErrorPath</key><string>/tmp/grocery-planday.err</string>
+</dict>
+</plist>
