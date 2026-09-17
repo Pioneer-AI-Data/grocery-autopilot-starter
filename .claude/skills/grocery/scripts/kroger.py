@@ -29,21 +29,27 @@ import urllib.request
 from pathlib import Path
 
 
-def _ssl_ctx():
-    """python.org framework builds ship with an empty trust store until their
-    Install Certificates step runs; fall back to certifi so this script works
-    under any Python on the machine."""
-    ctx = ssl.create_default_context()
-    if ctx.cert_store_stats().get("x509_ca", 0) == 0:
+SSL_CTX = ssl.create_default_context()
+
+
+def _open_url(req, timeout):
+    """urlopen with a lazy certifi fallback: some Pythons (python.org framework
+    builds) have an empty trust store; the Homebrew build reports empty stats
+    but verifies fine, so the only honest test is the handshake itself."""
+    global SSL_CTX
+    try:
+        return urllib.request.urlopen(req, timeout=timeout, context=SSL_CTX)
+    except urllib.error.URLError as e:
+        if "CERTIFICATE_VERIFY_FAILED" not in str(e):
+            raise
         try:
             import certifi
-            ctx = ssl.create_default_context(cafile=certifi.where())
         except ImportError:
-            pass
-    return ctx
-
-
-SSL_CTX = _ssl_ctx()
+            sys.exit("This Python cannot verify HTTPS (empty trust store, no "
+                     "certifi). Run it with a Python that has certificates, "
+                     "or: python3 -m pip install certifi")
+        SSL_CTX = ssl.create_default_context(cafile=certifi.where())
+        return urllib.request.urlopen(req, timeout=timeout, context=SSL_CTX)
 
 API = "https://api.kroger.com/v1"
 HERE = Path(__file__).resolve().parent
@@ -102,7 +108,7 @@ def token_post(body):
         API + "/connect/oauth2/token", data=urllib.parse.urlencode(body).encode(),
         headers={"Authorization": "Basic " + basic,
                  "Content-Type": "application/x-www-form-urlencoded"})
-    with urllib.request.urlopen(req, timeout=20, context=SSL_CTX) as r:
+    with _open_url(req, 20) as r:
         return json.load(r)
 
 
@@ -187,7 +193,7 @@ def cmd_cart_add():
         method="PUT",
         headers={"Authorization": "Bearer " + user_token(),
                  "Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=30, context=SSL_CTX) as r:
+    with _open_url(req, 30) as r:
         print("cart add HTTP", r.status, "-", len(items), "items pushed (PICKUP)")
 
 
@@ -202,7 +208,7 @@ def token():
         API + "/connect/oauth2/token", data=body,
         headers={"Authorization": "Basic " + basic,
                  "Content-Type": "application/x-www-form-urlencoded"})
-    with urllib.request.urlopen(req, timeout=20, context=SSL_CTX) as r:
+    with _open_url(req, 20) as r:
         d = json.load(r)
     _tok["value"] = d["access_token"]
     _tok["exp"] = time.time() + d.get("expires_in", 1800)
@@ -212,7 +218,7 @@ def token():
 def get(path, params):
     url = API + path + "?" + urllib.parse.urlencode(params)
     req = urllib.request.Request(url, headers={"Authorization": "Bearer " + token()})
-    with urllib.request.urlopen(req, timeout=20, context=SSL_CTX) as r:
+    with _open_url(req, 20) as r:
         return json.load(r)
 
 
